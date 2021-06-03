@@ -7,11 +7,10 @@ import java.util.Scanner;
 public class customersItems {
     static ArrayList<Items> item = new ArrayList<>();
     static ArrayList<Items> removeItem = new ArrayList<>();
-    static ArrayList<Items> scanItem = new ArrayList<>();
 
     static Scanner input = new Scanner(System.in);
 
-
+    static int paying = generatorRandomPay();
 //    public static void items() {
 //        item.add(new Items("Sprite 24 pack", 7.88));
 //        item.add(new Items("Dr Pepper 12 pack", 5.18));
@@ -158,29 +157,27 @@ public class customersItems {
         return Math.round(tax * 100) / 100.0;
     }
 
-    public static double customerWallet(){
-        int paying = generatorRandomPay();
-        
+    public static double customerWallet(double total){
         double customerPaying = 0;
-        
+
         if (paying == 1){
-            customerPaying = Math.round(calculatingTotal())+2;
+            customerPaying = Math.round(total)+2;
         }else if(paying == 2){
-            customerPaying = Math.round(calculatingTotal());
+            customerPaying = Math.round(total);
         }
         else if(paying == 3){
-            customerPaying = Math.round(calculatingTotal());
+            customerPaying = Math.round(total);
         }
         else if(paying == 4){
-            customerPaying = Math.round(calculatingTotal());
+            customerPaying = Math.round(total);
         }
         else if(paying == 5){
-            customerPaying = Math.round(calculatingTotal())+3;
+            customerPaying = Math.round(total)+3;
         }
         else if(paying == 6){
-            customerPaying = Math.round(calculatingTotal())+5;
+            customerPaying = Math.round(total)+5;
         }
-        if(customerPaying < calculatingTotal()){
+        if(customerPaying < total){
             customerPaying++;
         }
 
@@ -200,29 +197,55 @@ public class customersItems {
         return random.nextInt(max + min) + min;
     }
 
-
-    public static void receipt(String cashOrDebit){
-        double customerPayed = customerWallet();
+    public static double paymentWithCash(){
+        double total = calculatingTotal();
+        double customerPayed = customerWallet(total);
         boolean validPayment = false;
         double amountPayed = 0;
-        int failToPay = 0;
-        if(cashOrDebit.equals("c")){
-            while(!validPayment){
-                System.out.printf("Customer gave you $" +  (("%.2f" + "\n")),customerPayed);
-                System.out.print("Customer Payment: $");
-                double payment = input.nextDouble();
-                if(payment >= calculatingTotal()){
-                    amountPayed = payment;
-                    validPayment = true;
-                }else if (failToPay == 2){
-                    System.out.println("**FAIL PAYMENT TRY AGAIN**");
-                    cashier.tryAgainPaying();
-                }else{
-                    System.out.println("**PAYMENT IS NOT OVER TOTAL**");
-                    failToPay++;
-                }
+        while(!validPayment){
+            System.out.printf("Customer gave you $" +  (("%.2f" + "\n")),customerPayed);
+            System.out.print("Customer Payment: $");
+            double payment = input.nextDouble();
+            if(payment >= calculatingTotal()){
+                amountPayed = payment;
+                validPayment = true;
+            }else{
+                System.out.println("**PAYMENT IS NOT OVER TOTAL**");
             }
+        }
+        return amountPayed;
+    }
 
+    public static double paymentWithDebit(){
+        double total = calculatingTotal();
+        double customerPayed = customerWallet(total);
+        boolean validPayment = false;
+        double amountPayed = 0;
+        while(!validPayment){
+            System.out.printf("Customer gave you $" +  (("%.2f" + "\n")),customerPayed);
+            System.out.print("Customer Payment: $");
+            double payment = input.nextDouble();
+            if(payment >= calculatingTotal()){
+                amountPayed = payment;
+                validPayment = true;
+            }else{
+                System.out.println("**PAYMENT IS NOT OVER TOTAL**");
+            }
+        }
+        return amountPayed;
+    }
+
+    public static int generatorRandomDebitCardNumber() {
+        int min = 1000;
+        int max = 9998;
+
+        Random random = new Random();
+
+        return random.nextInt(max + min) + min;
+    }
+
+    public static void receipt(String cashOrDebit, double pay){
+        if(cashOrDebit.equals("c")){
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             for (Items items : item){
                 System.out.printf("- ItemName: "+items.itemName +" | Quantity:"+items.quantity+" | Cost: $"+(("%.2f"+ "\n")),items.priceItem);
@@ -231,8 +254,8 @@ public class customersItems {
             System.out.printf("                                 SUBTOTAL       $"+(("%.2f"+ "\n")),calculatingSubTotal());
             System.out.printf("                                 TAX            $"+(("%.2f"+ "\n")),+calculatingTaxes());
             System.out.printf("                                 TOTAL          $"+(("%.2f"+ "\n")),calculatingTotal());
-            System.out.printf("                                 CASH DUE       $"+(("%.2f"+ "\n")),customerPayed);
-            System.out.printf("                                 CHANGE DUE     $"+(("%.2f"+ "\n")),calculatingCustomerPayment(amountPayed));
+            System.out.printf("                                 CASH DUE       $"+(("%.2f"+ "\n")),pay);
+            System.out.printf("                                 CHANGE DUE     $"+(("%.2f"+ "\n")),calculatingCustomerPayment(pay));
         }else if(cashOrDebit.equals("d")){
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             for (Items itemsScan : item){
@@ -246,10 +269,6 @@ public class customersItems {
             System.out.println("                                 CHANGE DUE     $0.00");
 
         }
-//
-//        System.out.printf("Total: $"+(("%.2f"+ "\n")), calculatingTotal());
-//
-//        System.out.println("$"+customerPayed);
 
     }
 }

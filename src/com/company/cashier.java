@@ -14,9 +14,9 @@ public class cashier {
         }else{
             isCustomer = true;
         }
-        checkingCustomerItems();
 
         while (!isCustomer){
+            checkingCustomerItems();
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             for (Items items : customersItems.item){
                 System.out.printf("- ItemName: "+items.itemName +" | Quantity:"+items.quantity+" | Cost: $"+(("%.2f"+ "\n")),items.priceItem);
@@ -47,14 +47,23 @@ public class cashier {
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.print("How would you like to pay?[Cash or Debit] ");
             String paying = input.next().substring(0, 1).toLowerCase();
-            if (paying.equals("c") || paying.equals("d")) {
+            if (paying.equals("c")) {
+                double pay = customersItems.paymentWithCash();
                 System.out.print("Would you like too have you receipt?[Y/N] ");
                 String receipt = input.next().substring(0,1).toLowerCase();
                 if(receipt.equals("y")){
-                    customersItems.receipt(paying);
+                    customersItems.receipt(paying, pay);
                 }
                 cashOrDebit = false;
-            } else {
+            } else if(paying.equals("d")){
+                double pay = customersItems.paymentWithCash();
+                System.out.print("Would you like too have you receipt?[Y/N] ");
+                String receipt = input.next().substring(0,1).toLowerCase();
+                if(receipt.equals("y")){
+                    customersItems.receipt(paying, pay);
+                }
+                cashOrDebit = false;
+            } else{
                 System.out.println("Please type in the correct input");
             }
         }
@@ -76,29 +85,29 @@ public class cashier {
         }
     }
 
-    public static void tryAgainPaying() {
-        boolean isCustomer = false;
-        while (!isCustomer) {
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            for (Items items : customersItems.item) {
-                System.out.printf("- ItemName: " + items.itemName + " | Quantity:" + items.quantity + " | Cost: $" + (("%.2f" + "\n")), items.priceItem);
-                System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            }
-            System.out.println("Checkout(c) - Update Your Items(u) - Delete item (d) - Add more Items (a)");
-            System.out.print("> ");
-            String userInput = input.next().substring(0, 1).toLowerCase();
-            if (userInput.equals("c")) {
-                paymentProcess();
-                isCustomer = true;
-            } else if (userInput.equals("u")) {
-                customersItems.updateItem();
-            } else if (userInput.equals("d")) {
-                customersItems.deleteItem();
-            } else if (userInput.equals("a")) {
-                checkingCustomerItems();
-            } else {
-                System.out.println("Please type in the correct input");
-            }
-        }
-    }
+//    public static void tryAgainPaying() {
+//        boolean isCustomer = false;
+//        while (!isCustomer) {
+//            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+//            for (Items items : customersItems.item) {
+//                System.out.printf("- ItemName: " + items.itemName + " | Quantity:" + items.quantity + " | Cost: $" + (("%.2f" + "\n")), items.priceItem);
+//                System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+//            }
+//            System.out.println("Checkout(c) - Update Your Items(u) - Delete item (d) - Add more Items (a)");
+//            System.out.print("> ");
+//            String userInput = input.next().substring(0, 1).toLowerCase();
+//            if (userInput.equals("c")) {
+//                paymentProcess();
+//                isCustomer = true;
+//            } else if (userInput.equals("u")) {
+//                customersItems.updateItem();
+//            } else if (userInput.equals("d")) {
+//                customersItems.deleteItem();
+//            } else if (userInput.equals("a")) {
+//                checkingCustomerItems();
+//            } else {
+//                System.out.println("Please type in the correct input");
+//            }
+//        }
+//    }
 }
