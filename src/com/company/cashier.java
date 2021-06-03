@@ -7,16 +7,23 @@ public class cashier {
     static Scanner input = new Scanner(System.in);
     public static void cashierPotions() {
         boolean isCustomer;
+        boolean customerItems;
         System.out.print("New Customer(Y or N)? ");
         String customer = input.next().substring(0,1).toLowerCase();
         if(customer.equals("y")){
             isCustomer = false;
+            customerItems = false;
         }else{
             isCustomer = true;
+            customerItems = true;
+        }
+
+        while (!customerItems){
+            checkingCustomerItems();
+            customerItems = true;
         }
 
         while (!isCustomer){
-            checkingCustomerItems();
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             for (Items items : customersItems.item){
                 System.out.printf("- ItemName: "+items.itemName +" | Quantity:"+items.quantity+" | Cost: $"+(("%.2f"+ "\n")),items.priceItem);
@@ -43,7 +50,7 @@ public class cashier {
     public static void paymentProcess(){
         boolean cashOrDebit = true;
         while (cashOrDebit) {
-            System.out.printf("\nHere is your Total: "+(("%.2f"+ "\n")),customersItems.calculatingTotal());
+            System.out.printf("\nHere is your Total: $"+(("%.2f"+ "\n")),customersItems.calculatingTotal());
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.print("How would you like to pay?[Cash or Debit] ");
             String paying = input.next().substring(0, 1).toLowerCase();
@@ -52,15 +59,17 @@ public class cashier {
                 System.out.print("Would you like too have you receipt?[Y/N] ");
                 String receipt = input.next().substring(0,1).toLowerCase();
                 if(receipt.equals("y")){
-                    customersItems.receipt(paying, pay);
+                    int card = 0;
+                    customersItems.receipt(paying, pay, card);
                 }
                 cashOrDebit = false;
             } else if(paying.equals("d")){
-                double pay = customersItems.paymentWithCash();
+                int card = customersItems.paymentWithDebit();
+                double pay = 0;
                 System.out.print("Would you like too have you receipt?[Y/N] ");
                 String receipt = input.next().substring(0,1).toLowerCase();
                 if(receipt.equals("y")){
-                    customersItems.receipt(paying, pay);
+                    customersItems.receipt(paying, pay, card);
                 }
                 cashOrDebit = false;
             } else{

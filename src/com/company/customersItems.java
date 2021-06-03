@@ -6,11 +6,12 @@ import java.util.Scanner;
 
 public class customersItems {
     static ArrayList<Items> item = new ArrayList<>();
-    static ArrayList<Items> removeItem = new ArrayList<>();
 
     static Scanner input = new Scanner(System.in);
 
     static int paying = generatorRandomPay();
+    static double cardNumber = generatorRandomDebitCardNumber();
+    static int cvvNumber = generatorRandomDebitCardCVVNumber();
 //    public static void items() {
 //        item.add(new Items("Sprite 24 pack", 7.88));
 //        item.add(new Items("Dr Pepper 12 pack", 5.18));
@@ -114,15 +115,14 @@ public class customersItems {
         boolean found = false;
         for(Items i : item){
             if(name.equalsIgnoreCase(i.itemName)){
-                System.out.println("Deleted "+ i.itemName+"off the item list\n");
-                removeItem.add(i);
+                System.out.println(i.itemName+" was deleted off the item list\n");
+                item.remove(i);
+
                 found = true;
+                break;
             }
         }
-        for(Items removeC : removeItem){
-            item.remove(removeC);
-        }
-        removeItem.clear();
+
         if(!found){
             System.out.println("This item doesn't exist");
         }
@@ -137,23 +137,13 @@ public class customersItems {
     }
 
     public static double calculatingTotal(){
-        double sum = 0;
-        for(Items d : item){
-            sum += (d.priceItem * d.quantity);
-        }
-        double tax = (sum * 0.07);
-        double round = Math.round(tax * 100) / 100.0;
-        double total = (sum + round);
+        double total = (calculatingSubTotal() + calculatingTaxes());
         return Math.round(total * 100) / 100.0;
     }
 
 
     public static double calculatingTaxes(){
-        double sum = 0;
-        for(Items d : item){
-            sum += (d.priceItem * d.quantity);
-        }
-        double tax = (sum * 0.07);
+        double tax = (calculatingSubTotal() * 0.07);
         return Math.round(tax * 100) / 100.0;
     }
 
@@ -206,8 +196,9 @@ public class customersItems {
             System.out.printf("Customer gave you $" +  (("%.2f" + "\n")),customerPayed);
             System.out.print("Customer Payment: $");
             double payment = input.nextDouble();
-            if(payment >= calculatingTotal()){
+            if(payment >= calculatingTotal() && payment == customerPayed){
                 amountPayed = payment;
+                System.out.println("**PAYMENT SUCCESSFULLY**");
                 validPayment = true;
             }else{
                 System.out.println("**PAYMENT IS NOT OVER TOTAL**");
@@ -216,35 +207,55 @@ public class customersItems {
         return amountPayed;
     }
 
-    public static double paymentWithDebit(){
-        double total = calculatingTotal();
-        double customerPayed = customerWallet(total);
-        boolean validPayment = false;
-        double amountPayed = 0;
-        while(!validPayment){
-            System.out.printf("Customer gave you $" +  (("%.2f" + "\n")),customerPayed);
-            System.out.print("Customer Payment: $");
-            double payment = input.nextDouble();
-            if(payment >= calculatingTotal()){
-                amountPayed = payment;
-                validPayment = true;
+    public static int paymentWithDebit(){
+        boolean validDebitNumber = false;
+        boolean validDebitNumberCVV = false;
+        int debitNumber = 0;
+        System.out.println("Customer enter their debit card number last four digits and their CVV number as well");
+        while(!validDebitNumber){
+            System.out.printf("Here is the Debit Card Number: " +(("%.0f"+ "\n")), cardNumber);
+            System.out.print("Enter the Debit Card Number: ");
+            int debit = input.nextInt();
+            if(debit == cardNumber){
+                debitNumber = debit;
+                System.out.println("**SUCCESSFULLY ENTER THE CORRECT DEBIT CARD NUMBER**\n");
+                validDebitNumber = true;
             }else{
-                System.out.println("**PAYMENT IS NOT OVER TOTAL**");
+                System.out.println("**INCORRECT DEBIT CARD NUMBER**");
             }
         }
-        return amountPayed;
+        while(!validDebitNumberCVV){
+            System.out.println("Here is the Debit Card CVV Number: " + cvvNumber);
+            System.out.print("Enter the Debit Card CVV Number: ");
+            int cvv = input.nextInt();
+            if(cvv == cvvNumber){
+                System.out.println("**SUCCESSFULLY ENTER THE CORRECT DEBIT CARD CVV NUMBER**\n");
+                validDebitNumberCVV = true;
+            }else{
+                System.out.println("**INCORRECT DEBIT CARD CVV NUMBER**");
+            }
+        }
+        return debitNumber;
     }
 
     public static int generatorRandomDebitCardNumber() {
         int min = 1000;
         int max = 9998;
 
-        Random random = new Random();
+        min = (int) Math.ceil(min);
+        max = (int) Math.floor(max);
+        return (int) (Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    public static int generatorRandomDebitCardCVVNumber() {
+        int min = 100;
+        int max = 998;
 
-        return random.nextInt(max + min) + min;
+        min = (int) Math.ceil(min);
+        max = (int) Math.floor(max);
+        return (int) (Math.floor(Math.random() * (max - min + 1)) + min);
     }
 
-    public static void receipt(String cashOrDebit, double pay){
+    public static void receipt(String cashOrDebit, double pay, int card){
         if(cashOrDebit.equals("c")){
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             for (Items items : item){
@@ -258,15 +269,17 @@ public class customersItems {
             System.out.printf("                                 CHANGE DUE     $"+(("%.2f"+ "\n")),calculatingCustomerPayment(pay));
         }else if(cashOrDebit.equals("d")){
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-            for (Items itemsScan : item){
-                System.out.println("- "+itemsScan.itemName +" \n  $"+itemsScan.priceItem);
+            for (Items items : item){
+                System.out.printf("- ItemName: "+items.itemName +" | Quantity:"+items.quantity+" | Cost: $"+(("%.2f"+ "\n")),items.priceItem);
             }
             System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             System.out.printf("                                 SUBTOTAL       $"+(("%.2f"+ "\n")),calculatingSubTotal());
             System.out.printf("                                 TAX            $"+(("%.2f"+ "\n")),+calculatingTaxes());
             System.out.printf("                                 TOTAL          $"+(("%.2f"+ "\n")),calculatingTotal());
-            System.out.printf("                                 DEBIT DUE      $"+(("%.2f"+ "\n")),calculatingTotal());
+            System.out.printf("                                 DEBIT (POS)    $"+(("%.2f"+ "\n")),calculatingTotal());
+            System.out.println("                                   XXXXXXXXXXXX"+ card);
             System.out.println("                                 CHANGE DUE     $0.00");
+
 
         }
 
