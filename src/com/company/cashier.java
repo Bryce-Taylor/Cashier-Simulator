@@ -8,6 +8,7 @@ public class cashier {
     public static void cashierPotions() {
         boolean isCustomer;
         boolean customerItems;
+        System.out.println("Welcome to the Cashier Simulator\n");
         System.out.print("New Customer(Y or N)? ");
         String customer = input.next().substring(0,1).toLowerCase();
         if(customer.equals("y")){
